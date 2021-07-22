@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+ext.getVersionCode = { base ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--count', base + '..HEAD'
+            standardOutput(stdout)
+        }
+        Integer.parseInt(stdout.toString().trim())
+    } catch(ignored) {
+        10
+    }
+}
+
+android {
+    compileSdkVersion 30
+    ndkVersion '21.4.7075529'
+
+    defaultConfig {
+        applicationId "pro.archiemeng.waifu2x"
+        archivesBaseName = "$applicationId"
+
+        ndk {
+            moduleName "ncnn"
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+
+        // Change here to choose the type of ncnn integration
+        externalNativeBuild {
+            cmake {
+                arguments "-DUSE_PREBUILT_NCNN=ON", "-DUSE_SHARED_NCNN=OFF"
+            }
+        }
+
+        // calculate commits number from initial commit
+        versionCode project.getVersionCode('665576c24caee5bca1bf4d8149223dccacbdd979')
+        // calculate commits number from version 1.1 commit
+        versionName '0.0.' + project.getVersionCode('665576c24caee5bca1bf4d8149223dccacbdd979')
+
+        minSdkVersion 24
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/jni/CMakeLists.txt')
+        }
+    }
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+}
