@@ -1,27 +1,50 @@
 # waifu2x-ncnn-vulkan-android
 
-This project is developed from the template [ncnn-android-deeplabv3plus](https://github.com/runrunrun1994/ncnn-android-deeplabv3plus) and reference the build method from  [ncnn-android-yolov5](https://github.com/nihui/ncnn-android-yolov5)
+[中文版](README_CN.md)
 
-[Waifu2x-ncnn-vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan) is a waifu2x converter [ncnn](https://github.com/Tencent/ncnn) version, runs fast on intel / amd / nvidia GPU with vulkan.
+## Introduction
 
-## how to build and run
-### step1
-https://github.com/Tencent/ncnn/releases
+This project is the first working version of Waifu2x ncnn Android app, which was initially developed
+from [ncnn-android-deeplabv3plus](https://github.com/runrunrun1994/ncnn-android-deeplabv3plus) as a
+template and reference the build method
+from  [ncnn-android-yolov5](https://github.com/nihui/ncnn-android-yolov5). And it has been updated
+with the latest JNI binding and build methods which is currently used by Waifu2x ncnn Android.
 
-download ncnn-android-vulkan.zip or build ncnn for android
+I hope that this project can be used as a reference by other developers to build more Android AI
+apps on Waifu2x ncnn Vulkan, or even more ncnn projects.
 
-### step2
-extract ncnn-android-vulkan.zip into app/src/main/jni or change the ncnn path to yours in app/src/main/jni/CMakeLists.txt
+## How to build
 
-### step3
-open this project with Android Studio, build it and enjoy!
+Just like other ncnn android demo projects, the only preparation is just about putting the
+approperiate ncnn lib into app/src/main/jni . However, in Waifu2x ncnn Android, there are mainly two
+options to choose from, and these result in different ncnn lib requirements. These two options are
+CMake flags: **"USE_PREBUILT_NCNN"** and **"USE_SHARED_NCNN"**.
 
-## Result(Device:kirin810) // Todo
-|Model|CPU|GPU|
+| \ |USE_PREBUILT_NCNN=ON (Default)|USE_PREBUILT_NCNN=OFF|
 |---|---|---|
-|deeplabv3+|**434.59**ms|**454.16**ms|
+|**USE_SHARED_NCNN=ON**|ncnn-android-vulkan-shared|ncnn (git repo)|
+|**USE_SHARED_NCNN=OFF (Default)**|ncnn-android-vulkan|ncnn (git repo)|
 
+To choose the ncnn build type, modify the corresponding section in
+the [app: build.gradle](app/build.gradle)
 
-|Original|Result|
-|---|---|
-|![org1](https://github.com/runrunrun1994/Image/blob/main/PersonSegmeantation/Android/pexels-photo-824109.jpg) |![res1](https://github.com/runrunrun1994/Image/blob/main/PersonSegmeantation/Android/pexels-photo-824109.png)|
+## Known issues
+
+- Sometimes, build may not be successful. (.etc, waifu2x.h cannot found VkVulkan syntex).
+
+## Screenshots
+
+![img](img/screenshot.png)
+
+## Aknowledgement
+
+I feel very appreciated to the following people and projects.
+
+- [nihui](https://github.com/nihui): Helped me to solve the critical issue in the JNI of Waifu2x
+  ncnn Vulkan at the ever beginning of this project.
+- [waifu2x-ncnn-vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan): The original ncnn project of
+  Waifu2x.
+- [ncnn-android-yolov5](https://github.com/nihui/ncnn-android-yolov5): Provides the right way to use
+  the current prebuilt ncnn library.
+- [ncnn-android-deeplabv3plus](https://github.com/runrunrun1994/ncnn-android-deeplabv3plus): work as
+  a template to build ncnn android app.
