@@ -18,8 +18,6 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.util.Log
 import pro.archiemeng.waifu2x.utils.Processor
-import pro.archiemeng.waifu2x.utils.toBytes
-import java.nio.ByteBuffer
 
 // all native class properties settings are normally written in JNI
 class Waifu2x : Processor {
@@ -40,8 +38,7 @@ class Waifu2x : Processor {
 
     private external fun RawLoad(assetManager: AssetManager, paramPath: String, modelPath: String)
 
-    private external fun RawProcess(inBuffer: ByteArray, inWidth: Int, inHeight: Int,
-                                    outBuffer: ByteArray, outWidth: Int, outHeight: Int)
+    private external fun RawProcess(inBitmap: Bitmap, outBitmap: Bitmap)
 
     private external fun SetScale(scale: Int)
 
@@ -111,13 +108,7 @@ class Waifu2x : Processor {
                 Bitmap.Config.ARGB_8888,
             )
             Log.d("$this", "output bitmap size: ${output.byteCount}")
-            val buffer = ByteBuffer.allocate(output.allocationByteCount)
-            output.copyPixelsToBuffer(buffer)
-            this.RawProcess(input.toBytes(), input.width, input.height,
-                buffer.array(), output.width, output.height)
-            Log.d("$this", "output buffer size: ${buffer.array().size}")
-            buffer.rewind()
-            output.copyPixelsFromBuffer(buffer)
+            this.RawProcess(input, output)
             input = output
             curScaler *= 2
         }

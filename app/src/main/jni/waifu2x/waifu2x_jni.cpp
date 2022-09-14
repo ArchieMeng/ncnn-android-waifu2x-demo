@@ -117,21 +117,28 @@ Java_pro_archiemeng_waifu2x_Waifu2x_RawLoad(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_pro_archiemeng_waifu2x_Waifu2x_RawProcess(JNIEnv *env, jobject thiz,
-                                               jbyteArray in_buffer, jint in_width, jint in_height,
-                                               jbyteArray out_buffer, jint out_width, jint out_height){
-    jbyte* in_bytes = env->GetByteArrayElements(in_buffer, nullptr);
-    jbyte* out_bytes = env->GetByteArrayElements(out_buffer, nullptr);
-    const ncnn::Mat in = ncnn::Mat(in_width, in_height, (void*) in_bytes, (size_t) 4, 4);
-    ncnn::Mat out = ncnn::Mat(out_width, out_height, (void*) out_bytes, (size_t) 4, 4);
+Java_pro_archiemeng_waifu2x_Waifu2x_RawProcess(JNIEnv *env, jobject thiz, jobject in_bitmap,
+                                               jobject out_bitmap) {
+    void *in_bytes, *out_bytes;
+    AndroidBitmapInfo in_info, out_info;
+    AndroidBitmap_lockPixels(env, in_bitmap, &in_bytes);
+    AndroidBitmap_lockPixels(env, out_bitmap, &out_bytes);
+
+    AndroidBitmap_getInfo(env, in_bitmap, &in_info);
+    AndroidBitmap_getInfo(env, out_bitmap, &out_info);
+
+    const ncnn::Mat in = ncnn::Mat(in_info.width, in_info.height, (void *) in_bytes, (size_t) 4, 4);
+    ncnn::Mat out = ncnn::Mat(out_info.width, out_info.height, (void *) out_bytes, (size_t) 4, 4);
 
     if (!gpu_mode) {
         // configure correct tilesize for cpu mode
-        waifu2x->tilesize = in_width > in_height ? in_width : in_height;
+        waifu2x->tilesize = in_info.width > in_info.height ? in_info.width : in_info.height;
     }
     waifu2x->process(in, out);
-    env->ReleaseByteArrayElements(in_buffer, in_bytes, JNI_ABORT);
-    env->ReleaseByteArrayElements(out_buffer, out_bytes, 0);
+
+    AndroidBitmap_unlockPixels(env, out_bitmap);
+    AndroidBitmap_unlockPixels(env, in_bitmap);
+
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "process done");
 }extern "C"
 JNIEXPORT void JNICALL
