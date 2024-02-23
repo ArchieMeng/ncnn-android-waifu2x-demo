@@ -87,3 +87,6 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+
+# ignore ncnn repo in jni path
+app/src/main/jni/ncnn

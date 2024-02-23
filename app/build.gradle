@@ -3,20 +3,18 @@ apply plugin: 'kotlin-android'
 
 ext.getVersionCode = { base ->
     try {
-        def stdout = new ByteArrayOutputStream()
-        exec {
+        providers.exec {
             commandLine 'git', 'rev-list', '--count', base + '..HEAD'
-            standardOutput(stdout)
-        }
-        Integer.parseInt(stdout.toString().trim())
+        }.standardOutput.asText.get().toInteger()
     } catch(ignored) {
         10
     }
 }
 
 android {
-    compileSdkVersion 30
-    ndkVersion '21.4.7075529'
+    namespace 'pro.archiemeng.waifu2x'
+    compileSdkVersion 34
+    ndkVersion '25.1.8937393'
 
     defaultConfig {
         applicationId "pro.archiemeng.waifu2x"
@@ -30,7 +28,7 @@ android {
         // Change here to choose the type of ncnn integration
         externalNativeBuild {
             cmake {
-                arguments "-DUSE_PREBUILT_NCNN=ON", "-DUSE_SHARED_NCNN=OFF"
+                arguments "-DUSE_PREBUILT_NCNN=OFF", "-DUSE_SHARED_NCNN=OFF", "-DNCNN_VULKAN=ON"
             }
         }
 

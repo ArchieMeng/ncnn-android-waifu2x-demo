@@ -1,0 +1,31 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "core" ]
+  pull_request:
+    branches: [ "core" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: get ncnn repo
+      run: git clone --recursive https://github.com/Tencent/ncnn app/src/main/jni/ncnn
+    - name: set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'zulu'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew build
+    - name: Build debug apk
+      run: bash ./gradlew assembleDebug --stacktrace
+
